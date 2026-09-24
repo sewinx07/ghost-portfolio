@@ -1,0 +1,341 @@
+---
+import Base from '../layouts/Base.astro';
+import BootScreen from '../components/BootScreen.astro';
+import HUD from '../components/HUD.astro';
+import Music from '../components/Music.astro';
+import MainMenu from '../components/MainMenu.astro';
+import Environment from '../components/Environment.astro';
+import LeafLayer from '../components/LeafLayer.astro';
+
+import HomeContent from '../sections/HomeContent.astro';
+import ProjectsContent from '../sections/ProjectsContent.astro';
+import AboutContent from '../sections/AboutContent.astro';
+import SkillsContent from '../sections/SkillsContent.astro';
+import ExperienceContent from '../sections/ExperienceContent.astro';
+import ContactContent from '../sections/ContactContent.astro';
+
+import { SCENES, SCENE_ORDER } from '../data/assets';
+---
+
+<Base>
+  <BootScreen />
+
+  <div class="world" data-world>
+    <!-- Scene environment -->
+    <div class="scene" data-scene data-scene="home">
+      <Environment scene="home" />
+      <LeafLayer depth="far" />
+      <LeafLayer depth="mid" />
+      <LeafLayer depth="near" />
+      <div class="foreground" aria-hidden="true"></div>
+    </div>
+
+    <!-- Environment preloading for the other scenes (home is already eager) -->
+    <div class="preloads" aria-hidden="true">
+      {
+        SCENE_ORDER.filter((ref) => ref !== 'home').map((ref) => (
+          <img src={SCENES[ref].environment} alt="" loading="lazy" decoding="async" />
+        ))
+      }
+    </div>
+
+    <!-- Content stack: only the active scene layer is visible -->
+    <div class="content-stack" data-content-stack>
+      <div class="content-layer" data-content="home"><HomeContent /></div>
+      <div class="content-layer" data-content="projects"><ProjectsContent /></div>
+      <div class="content-layer" data-content="about"><AboutContent /></div>
+      <div class="content-layer" data-content="skills"><SkillsContent /></div>
+      <div class="content-layer" data-content="experience"><ExperienceContent /></div>
+      <div class="content-layer" data-content="contact"><ContactContent /></div>
+    </div>
+
+    <!-- Transition veil -->
+    <div class="transition-veil" data-veil aria-hidden="true"></div>
+
+    <!-- Main cinematic menu (left side) -->
+    <MainMenu />
+  </div>
+
+  <HUD />
+  <Music />
+
+  <main class="sr-only">
+    <h1>SEWINX — Taha Gmir, Creative Developer & Designer</h1>
+  </main>
+
+  <div data-cursor-root></div>
+</Base>
+
+<style>
+  .world {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: var(--ink);
+  }
+  .preloads {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+  }
+  .content-stack {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+  }
+  .content-layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s var(--ease-cinematic), visibility 0.6s;
+    padding: 5rem var(--gutter);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    max-height: 100%;
+    overflow: auto;
+    pointer-events: none;
+  }
+  .content-layer.is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .content-layer .section-content {
+    max-width: 36rem;
+    margin-right: 5rem;
+  }
+  .transition-veil {
+    position: absolute;
+    inset: 0;
+    z-index: 55;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(11, 8, 6, 0) 30%,
+      rgba(11, 8, 6, 0.65) 100%
+    );
+    opacity: 0;
+  }
+  /* Foreground grounding layer — sits above leaves, below content.
+     Grounds the scene with a soft bottom contact shadow and a faint
+     edge vignette so content reads as integrated rather than floating. */
+  .foreground {
+    position: absolute;
+    inset: 0;
+    z-index: 34;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(8, 6, 4, 0) 62%, rgba(6, 4, 3, 0.55) 100%),
+      radial-gradient(ellipse at center, rgba(8, 6, 4, 0) 66%, rgba(7, 5, 4, 0.42) 100%);
+  }
+  /* Cursor */
+  :global(.cursor) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 90;
+    pointer-events: none;
+    opacity: 0;
+  }
+  :global(.cursor-dot) {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+    transform: translate(-50%, -50%);
+  }
+  :global(.cursor-label) {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.24em;
+    color: var(--bone);
+    opacity: 0;
+  }
+  :global(.is-touch) .cursor {
+    display: none;
+  }
+
+  @media (max-width: 1024px) {
+    .content-layer .section-content {
+      margin-right: 2rem;
+    }
+  }
+  @media (max-width: 720px) {
+    .world {
+      position: relative;
+      min-height: 100vh;
+    }
+    .content-layer {
+      padding-top: 6rem;
+      align-items: flex-start;
+      justify-content: center;
+      max-height: 100%;
+      overflow: auto;
+    }
+    .content-layer .section-content {
+      margin: 0;
+      padding-bottom: 6rem;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { runBoot } from '../animations/boot';
+  import { createSceneController } from '../animations/scene-controller';
+  import { initCursor } from '../animations/cursor';
+  import { initParallax } from '../animations/parallax';
+  import { createLeaves } from '../animations/leaves';
+  import { SCENES, SCENE_ORDER, type SceneRef } from '../data/assets';
+
+  const world = document.querySelector<HTMLElement>('[data-world]')!;
+  const bootRoot = document.querySelector<HTMLElement>('[data-boot-root]')!;
+  const sceneRoot = document.querySelector<HTMLElement>('[data-scene]')!;
+  const veil = document.querySelector<HTMLElement>('[data-veil]')!;
+  const contentStack = document.querySelector<HTMLElement>('[data-content-stack]')!;
+  const hudSection = document.querySelector<HTMLElement>('[data-hud-section]')!;
+  const hudIndex = document.querySelector<HTMLElement>('[data-hud-index]')!;
+  const isTouchDevice = document.documentElement.classList.contains('is-touch');
+
+  // Reveal content for whichever scene is active
+  const contentLayers = Array.from(
+    contentStack.querySelectorAll<HTMLElement>('[data-content]'),
+  );
+  const showContent = (ref: string) => {
+    contentLayers.forEach((l) => {
+      const active = l.dataset.content === ref;
+      l.classList.toggle('is-active', active);
+      if (active) {
+        const container = l.querySelector<HTMLElement>('.section-content');
+        if (container) {
+          gsap.fromTo(
+            container,
+            { opacity: 0 },
+            { opacity: 1, duration: 0.7, ease: 'power2.out', overwrite: 'auto' },
+          );
+        }
+        const fades = Array.from(l.querySelectorAll<HTMLElement>('[data-fade-in]'));
+        if (fades.length) {
+          gsap.fromTo(
+            fades,
+            { opacity: 0, y: 26 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.9,
+              stagger: 0.09,
+              delay: 0.25,
+              ease: 'power3.out',
+              overwrite: 'auto',
+              clearProps: 'opacity,transform',
+            },
+          );
+        }
+      } else {
+        // Reset for next visit
+        const container = l.querySelector<HTMLElement>('.section-content');
+        if (container) gsap.set(container, { opacity: 0 });
+      }
+    });
+  };
+
+  const cleanupLeaves: Array<() => void> = [];
+  const leafLayers = Array.from(
+    sceneRoot.querySelectorAll<HTMLElement>('[data-leaf-layer]'),
+  );
+  leafLayers.forEach((layer) => {
+    const type = layer.dataset.depthType as 'far' | 'mid' | 'near';
+    const count = parseInt(layer.dataset.leaves || '10', 10);
+    // Skip heavy near layer on touch
+    const effectiveCount = isTouchDevice && type === 'near' ? 0 : count;
+    cleanupLeaves.push(createLeaves(layer, { depth: type, count: effectiveCount }));
+  });
+
+  const menuItems = [
+    { ref: 'home', label: 'Home' },
+    { ref: 'projects', label: 'Projects' },
+    { ref: 'about', label: 'About' },
+    { ref: 'skills', label: 'Skills' },
+    { ref: 'experience', label: 'Experience' },
+    { ref: 'contact', label: 'Contact' },
+  ];
+
+  const menuRoot = document.querySelector<HTMLElement>('[data-menu]')!;
+  const controllerCleanup = menuRoot
+    ? createSceneController(menuItems, {
+        sceneRoot,
+        menuRoot,
+        veilRoot: veil,
+        hudSection,
+        hudIndex,
+        onSceneChange: (ref) => showContent(ref),
+      })
+    : () => {};
+
+  const cursorCleanup = initCursor();
+  const parallaxCleanup = initParallax(world);
+
+  // Boot flow
+  let revealed = false;
+  const reveal = () => {
+    if (revealed) return;
+    revealed = true;
+    if (bootRoot) {
+      gsap.to(bootRoot, {
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.inOut',
+        onComplete: () => bootRoot.remove(),
+      });
+      // Fallback: ensure the boot toast is removed even if rAF is throttled.
+      window.setTimeout(() => bootRoot?.remove(), 1200);
+    }
+    // Reveal menu chrome (non-content fade-ins on the world/menu)
+    const menuEls = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-menu] [data-fade-in]'),
+    );
+    if (menuEls.length) {
+      gsap.fromTo(
+        menuEls,
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 1, stagger: 0.08, ease: 'power3.out', clearProps: 'opacity,transform' },
+      );
+    }
+    // Reveal active content (home)
+    showContent('home');
+  };
+
+  const cleanupBoot = runBoot(bootRoot, { onComplete: reveal, onSkip: reveal });
+
+  // Menu "goto" buttons (ENTER WORLD etc.)
+  document.addEventListener('click', (e) => {
+    const target = (e.target as HTMLElement).closest<HTMLElement>('[data-menu-goto]');
+    if (target) {
+      const ref = target.dataset.menuGoto as SceneRef;
+      if (SCENE_ORDER.includes(ref)) {
+        const idx = SCENE_ORDER.indexOf(ref);
+        const btn = Array.from(
+          menuRoot.querySelectorAll<HTMLButtonElement>('[data-menu-item]'),
+        )[idx];
+        btn?.click();
+      }
+    }
+  });
+
+  window.addEventListener('beforeunload', () => {
+    cleanupBoot();
+    controllerCleanup();
+    cursorCleanup();
+    parallaxCleanup();
+    cleanupLeaves.forEach((c) => c());
+  });
+</script>

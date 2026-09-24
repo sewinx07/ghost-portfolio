@@ -1,0 +1,299 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getProject, PROJECTS } from '../../data/projects';
+
+export async function getStaticPaths() {
+  return PROJECTS.map((p) => ({ params: { slug: p.slug } }));
+}
+
+const { slug } = Astro.params;
+const project = getProject(slug);
+
+if (!project) {
+  return Astro.redirect('/404');
+}
+
+const image = project.image ?? project.thumbnail;
+---
+
+<Base title={`${project.title} — SEWINX`} description={project.overview} image={image}>
+  <div class="project-page">
+    <nav class="project-nav" aria-label="Project navigation">
+      <a class="project-nav__brand display" href="/">SEWINX</a>
+      <a class="project-nav__back mono" href="/#projects" data-cursor="BACK">
+        ← BACK TO SYSTEM
+      </a>
+    </nav>
+
+    <header class="project-hero">
+      <p class="eyebrow">PROJECT</p>
+      <h1 class="project-hero__title display">{project.title}</h1>
+      <p class="project-hero__cat mono">{project.category}</p>
+
+      <div class="project-meta mono" >
+        <div class="meta"><span class="meta__k">CATEGORY</span><span>{project.category}</span></div>
+        <div class="meta"><span class="meta__k">YEAR</span><span>{project.year}</span></div>
+        <div class="meta"><span class="meta__k">ROLE</span><span>{project.role}</span></div>
+      </div>
+    </header>
+
+    <section class="project-hero-img">
+      <img src={image} alt={`${project.title} visual`} loading="eager" />
+    </section>
+
+    <div class="project-body">
+      <section class="project-section" data-reveal>
+        <h2 class="project-section__title display">Overview</h2>
+        <p class="project-section__text">{project.overview}</p>
+      </section>
+
+      <section class="project-section" data-reveal>
+        <h2 class="project-section__title display">Process</h2>
+        <p class="project-section__text">{project.process}</p>
+      </section>
+
+      <section class="project-section" data-reveal>
+        <h2 class="project-section__title display">Features</h2>
+        <ul class="project-features">
+          {project.features.map((f) => (
+            <li class="project-features__item mono">{f}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="project-section" data-reveal>
+        <h2 class="project-section__title display">Result</h2>
+        <p class="project-section__text">{project.result}</p>
+      </section>
+
+      <section class="project-tech" data-reveal>
+        <h2 class="project-section__title display">Technologies</h2>
+        <div class="tech-list mono">
+          {project.technologies.map((t) => (
+            <span class="tech-chip">{t}</span>
+          ))}
+        </div>
+      </section>
+
+      <div class="project-links" data-reveal>
+        {project.link && (
+          <a class="btn btn--primary" href={project.link} target="_blank" rel="noopener" data-cursor="VISIT">
+            LIVE PROJECT
+          </a>
+        )}
+        {project.source && (
+          <a class="btn btn--ghost" href={project.source} target="_blank" rel="noopener" data-cursor="VISIT">
+            SOURCE
+          </a>
+        )}
+        <a class="btn btn--ghost" href="/#projects" data-cursor="BACK">← BACK</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="leaf-veil" aria-hidden="true">
+    <div class="leaf-veil__fog"></div>
+  </div>
+</Base>
+
+<style>
+  .project-page {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 1.5rem var(--gutter) 4rem;
+    color: var(--bone);
+  }
+  .project-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0 2rem;
+    border-bottom: 1px solid rgba(207, 196, 178, 0.12);
+    margin-bottom: 2.5rem;
+  }
+  .project-nav__brand {
+    font-size: 1.15rem;
+    letter-spacing: 0.36em;
+  }
+  .project-nav__back {
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    color: var(--mist-dim);
+    transition: color 0.2s;
+  }
+  .project-nav__back:hover {
+    color: var(--red-bright);
+  }
+  .project-hero {
+    margin-bottom: 2rem;
+  }
+  .project-hero__title {
+    font-size: clamp(2.6rem, 7vw, 4.5rem);
+    letter-spacing: 0.04em;
+    margin: 0.6rem 0 0.4rem;
+  }
+  .project-hero__cat {
+    color: var(--red-bright);
+    font-size: 0.78rem;
+    letter-spacing: 0.3em;
+  }
+  .project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.6rem 2.5rem;
+    margin-top: 1.8rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid rgba(207, 196, 178, 0.12);
+  }
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.82rem;
+    color: var(--mist);
+  }
+  .meta__k {
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+    color: var(--mist-dim);
+  }
+  .project-hero-img {
+    margin: 2.4rem 0 3rem;
+    border: 1px solid rgba(207, 196, 178, 0.12);
+    overflow: hidden;
+  }
+  .project-hero-img img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .project-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2.6rem;
+  }
+  .project-section__title {
+    font-size: 1.6rem;
+    color: var(--red-bright);
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.02em;
+  }
+  .project-section__text {
+    font-size: 1.02rem;
+    line-height: 1.75;
+    color: var(--mist);
+    max-width: 70ch;
+  }
+  .project-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .project-features__item {
+    padding-left: 1.2rem;
+    position: relative;
+    color: var(--mist);
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+  }
+  .project-features__item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 7px;
+    height: 7px;
+    background: var(--red);
+    transform: rotate(45deg);
+  }
+  .tech-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .tech-chip {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--mist);
+    border: 1px solid rgba(207, 196, 178, 0.25);
+    padding: 0.45rem 0.9rem;
+  }
+  .project-links {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(207, 196, 178, 0.12);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1.6rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transition: transform 0.2s, background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .btn--primary {
+    background: var(--red);
+    color: #fff;
+  }
+  .btn--primary:hover {
+    background: var(--red-bright);
+    transform: translateY(-2px);
+  }
+  .btn--ghost {
+    border: 1px solid rgba(207, 196, 178, 0.35);
+    color: var(--bone);
+  }
+  .btn--ghost:hover {
+    border-color: var(--bone);
+    background: rgba(207, 196, 178, 0.06);
+  }
+  .leaf-veil {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .leaf-veil__fog {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 30%, rgba(192,57,43,0.08), rgba(11,8,6,0) 60%);
+  }
+  .leaf-veil::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.5) 100%);
+    pointer-events: none;
+  }
+  [data-reveal] {
+    opacity: 0;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
+  items.forEach((el, i) => {
+    gsap.to(el, {
+      opacity: 1,
+      y: 0,
+      ease: 'power2.out',
+      duration: 0.9,
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 85%',
+        once: true,
+      },
+    });
+  });
+</script>

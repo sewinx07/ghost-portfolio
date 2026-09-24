@@ -1,0 +1,134 @@
+---
+import type { SceneRef } from '../data/assets';
+import { SCENES } from '../data/assets';
+
+interface Props {
+  scene: SceneRef;
+  class?: string;
+}
+
+const { scene } = Astro.props;
+const sceneData = SCENES[scene];
+const eager = scene === 'home';
+---
+
+<div
+  class="environment"
+  data-scene
+  data-env-layer
+  data-depth="0.06"
+  style={`--grade: ${sceneData.grade}; --light: ${sceneData.light};`}
+>
+  <div class="environment__bg" aria-hidden="true">
+    <img
+      src={sceneData.environment}
+      alt=""
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : 'auto'}
+      decoding="async"
+      data-env-img
+    />
+    <div class="environment__tint" data-env-tint></div>
+    {
+      sceneData.sun && (
+        <div
+          class="environment__sun"
+          data-sun
+          style={`--sx: ${sceneData.sun.x}; --sy: ${sceneData.sun.y}; --sc: ${sceneData.sun.color}; --ss: ${sceneData.sun.size};`}
+        ></div>
+      )
+    }
+  </div>
+
+  <div class="environment__fog fog-layer fog-layer--a" aria-hidden="true"></div>
+  <div class="environment__fog fog-layer fog-layer--b" aria-hidden="true"></div>
+</div>
+
+<style>
+  .environment {
+    position: absolute;
+    inset: 0;
+    z-index: var(--z-env);
+    overflow: hidden;
+    transform: translate3d(0, 0, 0);
+  }
+  .environment__bg {
+    position: absolute;
+    inset: 0;
+  }
+  .environment__bg img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: var(--grade, saturate(0.9) contrast(1.02));
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+  .environment__tint {
+    position: absolute;
+    inset: 0;
+    background: var(--light, none);
+    mix-blend-mode: normal;
+  }
+  /* Light source surfing the scene: a bright core over a wide warm halo,
+     together breathing so sunlight pools through the environment. */
+  .environment__sun {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0.86;
+    background:
+      radial-gradient(circle at var(--sx, 50%) var(--sy, 40%), rgba(255,255,245,0.06) 60%, rgba(255,255,255,0) 72%),
+      radial-gradient(circle at var(--sx, 50%) var(--sy, 40%), var(--sc, rgba(255,220,170,0.4)) 0%, rgba(255,255,255,0) 46%);
+    animation: sun-breathe 11s ease-in-out infinite;
+  }
+  @keyframes sun-breathe {
+    0%,
+    100% {
+      opacity: 0.8;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.98;
+      transform: scale(1.04);
+    }
+  }
+  .fog-layer {
+    position: absolute;
+    left: -20%;
+    width: 140%;
+    height: 100%;
+    background: radial-gradient(
+      ellipse at 30% 50%,
+      rgba(200, 185, 160, 0.14),
+      rgba(200, 185, 160, 0) 70%
+    );
+    pointer-events: none;
+    filter: blur(30px);
+  }
+  .fog-layer--a {
+    top: 20%;
+    animation: fog-drift 26s linear infinite;
+  }
+  .fog-layer--b {
+    top: 55%;
+    animation: fog-drift 34s linear infinite reverse;
+  }
+  @keyframes fog-drift {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(18%);
+    }
+  }
+  @media (max-width: 720px) {
+    .fog-layer {
+      display: none;
+    }
+  }
+</style>

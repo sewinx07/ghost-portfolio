@@ -1,0 +1,19 @@
+{
+  "name": "sewinx-portfolio",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.1.0",
+    "gsap": "^3.12.5"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.9.0"
+  }
+}

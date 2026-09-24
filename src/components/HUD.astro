@@ -1,0 +1,104 @@
+---
+---
+
+<header class="hud" data-hud aria-label="System status">
+  <div class="hud__corner hud__tl">
+    <span class="hud__brand display">SEWINX</span>
+    <span class="hud__sub mono">CREATIVE DEVELOPER</span>
+  </div>
+  <div class="hud__corner hud__tr">
+    <span class="hud__status mono">SYSTEM ONLINE</span>
+    <span class="hud__dot" aria-hidden="true"></span>
+  </div>
+  <div class="hud__corner hud__bl mono" data-hud-section>THE BEGINNING</div>
+  <div class="hud__corner hud__br mono" data-hud-index>01 / 06</div>
+</header>
+
+<style>
+  .hud {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .hud__corner {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .hud__tl {
+    top: 1.5rem;
+    left: var(--gutter);
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .hud__brand {
+    font-size: 1.15rem;
+    letter-spacing: 0.4em;
+    color: var(--bone);
+  }
+  .hud__sub {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--mist-dim);
+  }
+  .hud__tr {
+    top: 1.5rem;
+    right: var(--gutter);
+  }
+  .hud__status {
+    font-size: 0.68rem;
+    letter-spacing: 0.3em;
+    color: var(--mist);
+  }
+  .hud__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #39d98a;
+    box-shadow: 0 0 8px #39d98a;
+    animation: pulse 2.4s infinite;
+  }
+  .hud__bl {
+    bottom: 1.5rem;
+    left: var(--gutter);
+    font-size: 0.66rem;
+    letter-spacing: 0.3em;
+    color: var(--mist-dim);
+  }
+  .hud__br {
+    bottom: 1.5rem;
+    right: var(--gutter);
+    font-size: 0.66rem;
+    letter-spacing: 0.3em;
+    color: var(--red-bright);
+  }
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hud__dot {
+      animation: none;
+    }
+  }
+
+  /* Mobile: simplified HUD */
+  @media (max-width: 720px) {
+    .hud__tr,
+    .hud__bl {
+      display: none;
+    }
+    .hud__corner {
+      gap: 0.4rem;
+    }
+  }
+</style>

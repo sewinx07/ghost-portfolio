@@ -1,0 +1,39 @@
+---
+interface Props {
+  depth?: 'far' | 'mid' | 'near';
+  count?: number;
+  class?: string;
+}
+
+const { depth = 'mid', count = 14, class: className = '' } = Astro.props;
+const counts = { far: 10, mid: 14, near: 8 };
+const n = count ?? counts[depth];
+---
+
+<div
+  class:list={[
+    `leaf-layer leaf-layer--${depth}`,
+    className,
+  ]}
+  data-depth="0.18"
+  data-leaf-layer
+  data-depth-type={depth}
+  data-leaves={n}
+  aria-hidden="true"
+></div>
+
+<style>
+  .leaf-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: var(--z-leaves-mid);
+  }
+  .leaf-layer--far {
+    z-index: var(--z-leaves-far);
+  }
+  .leaf-layer--near {
+    z-index: var(--z-leaves-near);
+  }
+</style>

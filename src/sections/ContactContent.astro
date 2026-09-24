@@ -1,0 +1,93 @@
+---
+---
+
+<div class="contact section-content">
+  <p class="eyebrow" data-fade-in>FINAL TRANSMISSION</p>
+  <h2 class="display section-title" data-fade-in>
+    Have a project?
+    <span>Let's build something.</span>
+  </h2>
+
+  <ul class="contact__links" data-fade-in>
+    <li>
+      <a class="contact__link mono" href="mailto:hello@sewinx.dev" data-cursor="SEND">
+        <span class="contact__tag">EMAIL</span>
+        <span class="contact__value">hello@sewinx.dev</span>
+      </a>
+    </li>
+    <li>
+      <a class="contact__link mono" href="https://github.com/sewinx" target="_blank" rel="noopener" data-cursor="VISIT">
+        <span class="contact__tag">GITHUB</span>
+        <span class="contact__value">github.com/sewinx</span>
+      </a>
+    </li>
+    <li>
+      <a class="contact__link mono" href="https://www.linkedin.com/in/sewinx" target="_blank" rel="noopener" data-cursor="VISIT">
+        <span class="contact__tag">LINKEDIN</span>
+        <span class="contact__value">linkedin.com/in/sewinx</span>
+      </a>
+    </li>
+  </ul>
+  <p class="contact__note mono" data-fade-in>RESPONSE TIME: ASAP</p>
+</div>
+
+<style>
+  .section-content {
+    max-width: 38rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    opacity: 0;
+  }
+  .section-title {
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    color: var(--bone);
+    line-height: 1.15;
+  }
+  .section-title span {
+    display: block;
+    color: var(--red-bright);
+    font-style: italic;
+  }
+  .contact__links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .contact__link {
+    display: flex;
+    align-items: baseline;
+    gap: 1.4rem;
+    padding: 0.9rem 0.2rem;
+    border-bottom: 1px solid rgba(207, 196, 178, 0.14);
+    transition:
+      color 0.2s,
+      border-color 0.2s,
+      padding-left 0.2s;
+  }
+  .contact__link:hover {
+    border-color: var(--red);
+    color: var(--bone);
+    padding-left: 0.6rem;
+  }
+  .contact__tag {
+    font-size: 0.68rem;
+    letter-spacing: 0.3em;
+    color: var(--red-bright);
+    width: 6rem;
+  }
+  .contact__value {
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    color: var(--mist);
+  }
+  .contact__link:hover .contact__value {
+    color: var(--bone);
+  }
+  .contact__note {
+    font-size: 0.66rem;
+    letter-spacing: 0.3em;
+    color: var(--mist-dim);
+  }
+</style>

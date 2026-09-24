@@ -1,0 +1,72 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="404 — Area Not Found · SEWINX" description="You wandered outside the SEWINX system.">
+  <main class="e404">
+    <div class="e404__inner">
+      <p class="e404__code display">404</p>
+      <h1 class="e404__title display">AREA NOT FOUND</h1>
+      <p class="e404__msg mono">
+        YOU WANDERED OUTSIDE<br />THE SYSTEM.
+      </p>
+      <a class="e404__btn mono" href="/" data-cursor="ENTER">
+        RETURN TO SYSTEM
+      </a>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .e404 {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 2rem;
+    background:
+      radial-gradient(ellipse at 50% 120%, rgba(192, 57, 43, 0.12), transparent 60%),
+      var(--ink);
+  }
+  .e404__code {
+    font-size: clamp(5rem, 18vw, 10rem);
+    line-height: 1;
+    color: var(--bone);
+    letter-spacing: 0.05em;
+  }
+  .e404__code::after {
+    content: '';
+    display: block;
+    width: 3rem;
+    height: 3px;
+    margin: 1rem auto;
+    background: var(--red);
+  }
+  .e404__title {
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    letter-spacing: 0.18em;
+    color: var(--red-bright);
+    margin-bottom: 1.4rem;
+  }
+  .e404__msg {
+    font-size: 0.8rem;
+    letter-spacing: 0.28em;
+    line-height: 2;
+    color: var(--mist-dim);
+    margin-bottom: 2.5rem;
+  }
+  .e404__btn {
+    display: inline-block;
+    font-size: 0.78rem;
+    letter-spacing: 0.26em;
+    padding: 1rem 2rem;
+    border: 1px solid rgba(207, 196, 178, 0.35);
+    color: var(--bone);
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .e404__btn:hover {
+    border-color: var(--red);
+    color: var(--red-bright);
+    background: rgba(192, 57, 43, 0.08);
+  }
+</style>

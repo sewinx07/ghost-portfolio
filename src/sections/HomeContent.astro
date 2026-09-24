@@ -1,0 +1,121 @@
+---
+---
+
+<div class="home section-content">
+  <p class="eyebrow" data-fade-in>ENTER MY WORLD</p>
+
+  <h1 class="home__name display" data-fade-in>
+    TAHA
+    <span class="home__name--last">GMIR</span>
+  </h1>
+
+  <p class="home__role mono" data-fade-in>
+    CREATIVE DEVELOPER <span class="sep">·</span> DESIGNER <span class="sep">·</span> ENGINEER
+  </p>
+
+  <p class="home__lead" data-fade-in>
+    I build cinematic interfaces where atmosphere and engineering become one.
+    This world is the first of those experiences.
+  </p>
+
+  <div class="home__cta" data-fade-in>
+    <a class="btn btn--primary" href="/projects/lernio" data-cursor="OPEN">
+      VIEW PROJECT
+    </a>
+    <a class="btn btn--ghost" data-menu-goto="projects" data-cursor="ENTER">
+      ENTER THE FORGE
+    </a>
+  </div>
+</div>
+
+<style>
+  .section-content {
+    max-width: 30rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    opacity: 0;
+    position: relative;
+  }
+  .section-content::before {
+    content: '';
+    position: absolute;
+    inset: -3rem -3rem -3rem -7rem;
+    background: radial-gradient(
+      ellipse at 70% 40%,
+      rgba(11, 8, 6, 0.72),
+      rgba(11, 8, 6, 0.35) 55%,
+      rgba(11, 8, 6, 0) 100%
+    );
+    z-index: -1;
+    pointer-events: none;
+    filter: blur(4px);
+  }
+  .home__name {
+    font-size: clamp(3rem, 8.5vw, 6.5rem);
+    line-height: 0.92;
+    letter-spacing: 0.06em;
+    color: var(--bone);
+    text-shadow: 0 4px 40px rgba(0, 0, 0, 0.8);
+    margin: 0.4rem 0 0.2rem;
+  }
+  .home__name--last {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--red-bright);
+    text-shadow: none;
+    filter: drop-shadow(0 4px 26px rgba(0, 0, 0, 0.7));
+  }
+  .home__role {
+    font-size: 0.74rem;
+    letter-spacing: 0.34em;
+    color: var(--mist);
+    text-transform: uppercase;
+  }
+  .home__role .sep {
+    color: var(--red-bright);
+    margin: 0 0.3rem;
+  }
+  .home__lead {
+    font-size: 1.02rem;
+    color: var(--mist);
+    max-width: 27rem;
+    line-height: 1.7;
+  }
+  .home__cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 0.6rem;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1.6rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transition:
+      transform 0.2s,
+      background 0.2s,
+      color 0.2s,
+      border-color 0.2s;
+  }
+  .btn--primary {
+    background: var(--red);
+    color: #fff;
+  }
+  .btn--primary:hover {
+    background: var(--red-bright);
+    transform: translateY(-2px);
+  }
+  .btn--ghost {
+    border: 1px solid rgba(207, 196, 178, 0.4);
+    color: var(--bone);
+  }
+  .btn--ghost:hover {
+    border-color: var(--bone);
+    background: rgba(207, 196, 178, 0.08);
+  }
+</style>

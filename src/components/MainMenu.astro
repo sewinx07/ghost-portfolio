@@ -1,0 +1,225 @@
+---
+import type { SceneRef } from '../data/assets';
+import { SCENES } from '../data/assets';
+
+interface Item {
+  ref: SceneRef;
+  label: string;
+}
+
+const items: Item[] = [
+  { ref: 'home', label: 'Home' },
+  { ref: 'projects', label: 'Projects' },
+  { ref: 'about', label: 'About' },
+  { ref: 'skills', label: 'Skills' },
+  { ref: 'experience', label: 'Experience' },
+  { ref: 'contact', label: 'Contact' },
+];
+---
+
+<nav class="menu" data-menu aria-label="Main navigation">
+  <p class="menu__eyebrow eyebrow" data-fade-in>ENDURE. ADAPT. CREATE.</p>
+  <h1 class="menu__title display" data-fade-in>
+    SEWINX
+  </h1>
+  <p class="menu__role mono" data-fade-in>CREATIVE DEVELOPER · DESIGNER</p>
+
+  <ul class="menu__list" data-menu-list data-fade-in>
+    {
+      items.map((it, i) => (
+        <li>
+          <button
+            class="menu-item mono"
+            role="menuitem"
+            data-menu-item
+            data-cursor="SELECT"
+            aria-selected={i === 0 ? 'true' : 'false'}
+          >
+            <span class="menu-item__num">{String(i + 1).padStart(2, '0')}</span>
+            <span class="menu-item__label">{it.label}</span>
+            <span class="menu-item__scene">{SCENES[it.ref].label}</span>
+          </button>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="menu__footer mono" data-fade-in>
+    <span>USE ↑ ↓ ENTER · ESC</span>
+    <span class="menu__scroll">SCROLL TO EXPLORE</span>
+  </div>
+</nav>
+
+<style>
+  .menu {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    max-width: 34rem;
+    padding: 0 var(--gutter);
+    pointer-events: auto;
+    z-index: var(--z-content);
+  }
+  .menu__eyebrow {
+    margin-bottom: 0.9rem;
+  }
+  .menu__title {
+    font-size: clamp(3.2rem, 8vw, 5.5rem);
+    letter-spacing: 0.14em;
+    line-height: 1;
+    color: var(--bone);
+    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.7);
+  }
+  .menu__role {
+    margin-top: 0.8rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.34em;
+    color: var(--mist);
+  }
+  .menu__list {
+    list-style: none;
+    margin-top: 2.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .menu-item {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.55rem 0.6rem;
+    color: var(--mist);
+    border-left: 2px solid transparent;
+    transition:
+      color 0.18s,
+      border-color 0.18s,
+      padding-left 0.18s,
+      background 0.18s;
+    position: relative;
+  }
+  .menu-item__num {
+    font-size: 0.68rem;
+    color: var(--mist-dim);
+    width: 1.6rem;
+  }
+  .menu-item__label {
+    font-size: 1.05rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .menu-item__scene {
+    margin-left: auto;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--mist-dim);
+    opacity: 0;
+    transform: translateX(-6px);
+    transition:
+      opacity 0.2s,
+      transform 0.2s;
+  }
+  .menu-item:hover,
+  .menu-item:focus-visible {
+    color: var(--bone);
+    border-left-color: var(--red);
+    padding-left: 1rem;
+    background: linear-gradient(90deg, rgba(192, 57, 43, 0.12), transparent);
+  }
+  .menu-item:hover .menu-item__scene,
+  .menu-item.is-active .menu-item__scene {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .menu-item.is-active {
+    color: var(--bone);
+    border-left-color: var(--red-bright);
+  }
+  .menu-item.is-active .menu-item__label::after {
+    content: '';
+    position: absolute;
+    left: 0.6rem;
+    bottom: 0.1rem;
+    height: 1.5px;
+    width: 2.2rem;
+    background: var(--red-bright);
+  }
+  .menu__footer {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--mist-dim);
+    gap: 1rem;
+  }
+  .menu__scroll {
+    display: none;
+  }
+
+  @media (max-width: 720px) {
+    .menu {
+      top: auto;
+      left: 0;
+      bottom: 1rem;
+      transform: none;
+      width: 100%;
+      padding: 0;
+      max-width: 100%;
+      background: linear-gradient(180deg, rgba(11, 8, 6, 0) 0%, rgba(11, 8, 6, 0.85) 30%);
+      padding-top: 2.5rem;
+    }
+    .menu__eyebrow,
+    .menu__title,
+    .menu__role {
+      display: none;
+    }
+    .menu__list {
+      margin-top: 0;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 0;
+      padding: 0 0.6rem 0.4rem;
+      overflow-x: auto;
+    }
+    .menu-item {
+      flex: 1 0 auto;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+      padding: 0.5rem 0.4rem;
+      border-left: none;
+      border-bottom: 2px solid transparent;
+      text-align: center;
+      min-width: 3.2rem;
+    }
+    .menu-item__num {
+      display: none;
+    }
+    .menu-item__label {
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+    }
+    .menu-item__scene {
+      display: none;
+    }
+    .menu-item:hover,
+    .menu-item:focus-visible {
+      border-left: none;
+      border-bottom-color: var(--red);
+      padding-left: 0.4rem;
+      background: none;
+    }
+    .menu-item.is-active {
+      border-bottom-color: var(--red-bright);
+    }
+    .menu-item.is-active .menu-item__label::after {
+      display: none;
+    }
+    .menu__footer {
+      display: none;
+    }
+  }
+</style>

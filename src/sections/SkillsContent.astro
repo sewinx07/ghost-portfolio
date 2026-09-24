@@ -1,0 +1,96 @@
+---
+import { SKILL_GROUPS } from '../data/skills';
+---
+
+<div class="skills section-content">
+  <p class="eyebrow" data-fade-in>SKILL SYSTEM</p>
+  <h2 class="display section-title" data-fade-in>The Elements</h2>
+
+  <div class="skill-tree" data-fade-in>
+    {
+      SKILL_GROUPS.map((group, gi) => (
+        <section class="skill-group">
+          <h3 class="skill-group__title mono">{group.title}</h3>
+          <ul class="skill-list">
+            {
+              group.skills.map((s, si) => (
+                <li class="skill">
+                  <span class="skill__node" aria-hidden="true"></span>
+                  <span class="skill__name">{s.name}</span>
+                  <span class="skill__line" aria-hidden="true"></span>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+  <p class="skill-note mono" data-fade-in>
+    VISUAL REPRESENTATION — REAL CAPABILITIES, NO FAKE VALUES
+  </p>
+</div>
+
+<style>
+  .section-content {
+    max-width: 40rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem;
+    opacity: 0;
+  }
+  .section-title {
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    color: var(--bone);
+  }
+  .skill-tree {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.6rem 2.4rem;
+  }
+  .skill-group__title {
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    color: var(--red-bright);
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid rgba(207, 196, 178, 0.18);
+  }
+  .skill-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .skill {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .skill__node {
+    width: 7px;
+    height: 7px;
+    background: var(--red);
+    transform: rotate(45deg);
+    flex: none;
+  }
+  .skill__name {
+    color: var(--mist);
+    font-size: 0.95rem;
+  }
+  .skill__line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(192, 57, 43, 0.4), transparent);
+  }
+  .skill-note {
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    color: var(--mist-dim);
+  }
+  @media (max-width: 720px) {
+    .skill-tree {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

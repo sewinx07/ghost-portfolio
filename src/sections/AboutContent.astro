@@ -1,0 +1,70 @@
+---
+---
+
+<div class="about section-content">
+  <p class="eyebrow" data-fade-in>PLAYER PROFILE</p>
+  <h2 class="display section-title" data-fade-in>TAHA GMIR</h2>
+
+  <dl class="profile" data-fade-in>
+    <div class="profile__row">
+      <dt class="mono">CLASS</dt>
+      <dd>Creative Developer</dd>
+    </div>
+    <div class="profile__row">
+      <dt class="mono">SPECIALIZATION</dt>
+      <dd>Code × Design × Motion</dd>
+    </div>
+    <div class="profile__row">
+      <dt class="mono">ORIGIN</dt>
+      <dd>The SEWINX Universe</dd>
+    </div>
+  </dl>
+
+  <p class="section-lead" data-fade-in>
+    I craft interactive worlds where cinematic atmosphere meets functional
+    engineering. Every project balances beauty with precision — never animation
+    for its own sake.
+  </p>
+</div>
+
+<style>
+  .section-content {
+    max-width: 34rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem;
+    opacity: 0;
+  }
+  .section-title {
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    color: var(--bone);
+  }
+  .profile {
+    border: 1px solid rgba(207, 196, 178, 0.18);
+    background: rgba(8, 6, 4, 0.5);
+    backdrop-filter: blur(4px);
+  }
+  .profile__row {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 1rem;
+    padding: 0.9rem 1.2rem;
+    border-bottom: 1px solid rgba(207, 196, 178, 0.1);
+    font-size: 0.9rem;
+  }
+  .profile__row:last-child {
+    border-bottom: none;
+  }
+  .profile__row dt {
+    color: var(--red-bright);
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+  }
+  .profile__row dd {
+    color: var(--mist);
+  }
+  .section-lead {
+    color: var(--mist);
+    font-size: 1rem;
+  }
+</style>
