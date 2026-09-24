@@ -4,7 +4,8 @@ import { isTouch, prefersReducedMotion } from './utils';
 /**
  * Mouse parallax — different layers drift at different speeds.
  * Subtle on background, stronger on foreground leaves, minimal on UI.
- * Apply this only to layers that carry NO other transform.
+ * Uses gsap.quickTo so each layer eases toward its target every frame,
+ * with will-change set once to avoid layer promotions mid-motion.
  */
 export function initParallax(scope: HTMLElement): () => void {
   if (isTouch() || prefersReducedMotion()) return () => {};
@@ -16,31 +17,32 @@ export function initParallax(scope: HTMLElement): () => void {
 
   const targets = layers.map((el) => {
     const depth = parseFloat(el.dataset.depth || '0.2');
-    return { el, depth, cx: 0, cy: 0, tx: 0, ty: 0 };
+    el.style.willChange = 'transform';
+    return {
+      el,
+      depth,
+      moveX: gsap.quickTo(el, 'x', { duration: 0.9, ease: 'power3.out' }),
+      moveY: gsap.quickTo(el, 'y', { duration: 0.9, ease: 'power3.out' }),
+    };
   });
 
   const onMove = (e: MouseEvent) => {
-    const nx = e.clientX / window.innerWidth - 0.5;
-    const ny = e.clientY / window.innerHeight - 0.5;
+    const nx = (e.clientX / window.innerWidth - 0.5) * 70;
+    const ny = (e.clientY / window.innerHeight - 0.5) * 46;
     targets.forEach((t) => {
-      t.tx = nx * t.depth * 70;
-      t.ty = ny * t.depth * 46;
+      t.moveX(nx * t.depth);
+      t.moveY(ny * t.depth);
     });
   };
 
-  const tick = () => {
-    targets.forEach((t) => {
-      t.cx += (t.tx - t.cx) * 0.06;
-      t.cy += (t.ty - t.cy) * 0.06;
-      t.el.style.transform = `translate3d(${t.cx.toFixed(1)}px, ${t.cy.toFixed(1)}px, 0)`;
-    });
-  };
-
-  window.addEventListener('mousemove', onMove);
-  gsap.ticker.add(tick);
+  window.addEventListener('mousemove', onMove, { passive: true });
 
   return () => {
     window.removeEventListener('mousemove', onMove);
-    gsap.ticker.remove(tick);
+    targets.forEach((t) => {
+      t.moveX.tween.kill();
+      t.moveY.tween.kill();
+      t.el.style.willChange = '';
+    });
   };
 }

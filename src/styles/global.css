@@ -140,6 +140,19 @@ button {
   outline-offset: 3px;
 }
 
+/* ---------- Leaves ---------- */
+/* Leaves are created at runtime by createLeaves(); --leaf-size and the
+   SVG background are set inline on each span. */
+.leaf {
+  position: absolute;
+  width: var(--leaf-size);
+  height: var(--leaf-size);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   *,

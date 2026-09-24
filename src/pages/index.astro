@@ -91,7 +91,6 @@ import { SCENES, SCENE_ORDER } from '../data/assets';
     inset: 0;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.6s var(--ease-cinematic), visibility 0.6s;
     padding: 5rem var(--gutter);
     display: flex;
     align-items: center;
@@ -114,12 +113,9 @@ import { SCENES, SCENE_ORDER } from '../data/assets';
     inset: 0;
     z-index: 55;
     pointer-events: none;
-    background: radial-gradient(
-      ellipse at center,
-      rgba(11, 8, 6, 0) 30%,
-      rgba(11, 8, 6, 0.65) 100%
-    );
+    background: #0b0806;
     opacity: 0;
+    will-change: opacity, transform;
   }
   /* Foreground grounding layer — sits above leaves, below content.
      Grounds the scene with a soft bottom contact shadow and a faint
@@ -219,21 +215,21 @@ import { SCENES, SCENE_ORDER } from '../data/assets';
         if (container) {
           gsap.fromTo(
             container,
-            { opacity: 0 },
-            { opacity: 1, duration: 0.7, ease: 'power2.out', overwrite: 'auto' },
+            { opacity: 0, scale: 0.99 },
+            { opacity: 1, scale: 1, duration: 0.7, ease: 'power3.out', overwrite: 'auto' },
           );
         }
         const fades = Array.from(l.querySelectorAll<HTMLElement>('[data-fade-in]'));
         if (fades.length) {
           gsap.fromTo(
             fades,
-            { opacity: 0, y: 26 },
+            { opacity: 0, y: 24 },
             {
               opacity: 1,
               y: 0,
-              duration: 0.9,
-              stagger: 0.09,
-              delay: 0.25,
+              duration: 0.8,
+              stagger: 0.07,
+              delay: 0.3,
               ease: 'power3.out',
               overwrite: 'auto',
               clearProps: 'opacity,transform',
@@ -243,10 +239,16 @@ import { SCENES, SCENE_ORDER } from '../data/assets';
       } else {
         // Reset for next visit
         const container = l.querySelector<HTMLElement>('.section-content');
-        if (container) gsap.set(container, { opacity: 0 });
+        if (container) gsap.set(container, { opacity: 0, scale: 0.99 });
       }
     });
   };
+
+  // Preload every environment image eagerly so scene swaps never pop-in
+  SCENE_ORDER.forEach((ref) => {
+    const pre = new Image();
+    pre.src = SCENES[ref].environment;
+  });
 
   const cleanupLeaves: Array<() => void> = [];
   const leafLayers = Array.from(

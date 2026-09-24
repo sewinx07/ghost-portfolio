@@ -39,6 +39,8 @@ export function createSceneController(
     });
   };
 
+  let transitionKill: (() => void) | null = null;
+
   const switchTo = (ref: SceneRef, instant = false) => {
     if (ref === current && !instant) return;
     current = ref;
@@ -52,16 +54,21 @@ export function createSceneController(
       opts.hudSection.textContent = scene.label.toUpperCase();
     if (opts.hudIndex)
       opts.hudIndex.textContent = `0${idx + 1} / 06`;
-    opts.onSceneChange?.(ref);
 
     if (instant || reduced) {
       applyScene(ref);
+      opts.onSceneChange?.(ref);
       return;
     }
 
-    playSceneTransition(opts.veilRoot, {
+    // Cancel any transition still in flight so rapid clicks never queue
+    transitionKill?.();
+    transitionKill = playSceneTransition(opts.veilRoot, {
       onMid: () => {
+        // Both the environment and the content layer resolve under full
+        // veil cover — nothing is ever visible mid-swap.
         applyScene(ref);
+        opts.onSceneChange?.(ref);
       },
     });
   };
@@ -104,7 +111,7 @@ export function createSceneController(
       gsap.fromTo(
         bg,
         { opacity: 0 },
-        { opacity: 1, duration: reduced ? 0 : 1.2, ease: 'power2.out' },
+        { opacity: 1, duration: reduced ? 0 : 0.45, ease: 'sine.inOut', overwrite: 'auto' },
       );
     }
 
@@ -168,6 +175,7 @@ export function createSceneController(
   window.addEventListener('keydown', onKey);
 
   return () => {
+    transitionKill?.();
     window.removeEventListener('keydown', onKey);
   };
 }
