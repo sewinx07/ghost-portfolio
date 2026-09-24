@@ -113,9 +113,11 @@ import { SCENES, SCENE_ORDER } from '../data/assets';
     inset: 0;
     z-index: 55;
     pointer-events: none;
-    background: #0b0806;
-    opacity: 0;
-    will-change: opacity, transform;
+    overflow: hidden;
+  }
+  .wind-leaf {
+    position: absolute;
+    will-change: transform;
   }
   /* Foreground grounding layer — sits above leaves, below content.
      Grounds the scene with a soft bottom contact shadow and a faint

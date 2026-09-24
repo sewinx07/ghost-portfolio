@@ -77,13 +77,41 @@ export function createSceneController(
     const scene = SCENES[ref];
     opts.sceneRoot.dataset.scene = ref;
 
-    // Swap environment image + tint/grade
+    // Swap environment image with a crossfade under the leaf wind
     const img = opts.sceneRoot.querySelector<HTMLImageElement>('[data-env-img]');
     const tint = opts.sceneRoot.querySelector<HTMLElement>('[data-env-tint]');
     const bg = opts.sceneRoot.querySelector<HTMLElement>('[data-env-layer]');
     if (img && img.dataset.src !== scene.environment) {
+      const oldSrc = img.dataset.src ?? img.getAttribute('src') ?? '';
+      const old = document.createElement('img');
+      old.alt = '';
+      old.src = oldSrc;
+      old.decoding = 'async';
+      old.style.cssText = [
+        'position:absolute',
+        'inset:0',
+        'width:100%',
+        'height:100%',
+        'object-fit:cover',
+        'object-position:center',
+        `filter:${getComputedStyle(img).filter}`,
+        'pointer-events:none',
+      ].join(';');
+      img.insertAdjacentElement('afterend', old);
+
       img.dataset.src = scene.environment;
       img.src = scene.environment;
+
+      if (reduced) {
+        old.remove();
+      } else {
+        gsap.to(old, {
+          opacity: 0,
+          duration: 0.85,
+          ease: 'power2.inOut',
+          onComplete: () => old.remove(),
+        });
+      }
     }
     if (bg) {
       // Cinematic color grade follows the scene's lighting
@@ -106,13 +134,6 @@ export function createSceneController(
       }
     } else if (sun) {
       sun.style.display = 'none';
-    }
-    if (bg) {
-      gsap.fromTo(
-        bg,
-        { opacity: 0 },
-        { opacity: 1, duration: reduced ? 0 : 0.45, ease: 'sine.inOut', overwrite: 'auto' },
-      );
     }
 
     // Character only on home
