@@ -1,0 +1,317 @@
+---
+export const prerender = false;
+import { getDb } from '@/server/db';
+import { getSession } from '@/server/auth';
+
+const sess = getSession(Astro.request);
+if (!sess?.authenticated) {
+  return Astro.redirect('/admin/login');
+}
+
+const db = getDb();
+const settings = db.prepare('SELECT key,value FROM settings').all().reduce((acc:any,r:any)=>{acc[r.key]=r.value;return acc;},{});
+const projects = db.prepare('SELECT * FROM projects ORDER BY featured DESC, id DESC').all();
+const skills = db.prepare('SELECT * FROM skills ORDER BY group_title, position').all();
+const experience = db.prepare('SELECT * FROM experience ORDER BY position, id DESC').all();
+const navigation = db.prepare('SELECT * FROM navigation ORDER BY position').all();
+const home = db.prepare('SELECT key,value FROM home').all().reduce((acc:any,r:any)=>{acc[r.key]=r.value;return acc;},{});
+const about = db.prepare('SELECT key,value FROM about').all().reduce((acc:any,r:any)=>{acc[r.key]=r.value;return acc;},{});
+const contact = db.prepare('SELECT key,value FROM contact').all().reduce((acc:any,r:any)=>{acc[r.key]=r.value;return acc;},{});
+const brand = db.prepare('SELECT key,value FROM brand').all().reduce((acc:any,r:any)=>{acc[r.key]=r.value;return acc;},{});
+const seo = db.prepare('SELECT key,value FROM seo').all().reduce((acc:any,r:any)=>{acc[r.key]=r.value;return acc;},{});
+const contributors = db.prepare('SELECT * FROM contributors ORDER BY id DESC').all();
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SEWINX / Master Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;700&family=Space+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style is:global>
+      :root {
+        --ink:#0b0806; --bone:#e8dfd0; --mist:#cfc4b2; --mist-dim:#b9b09e; --red:#c0392b; --red-bright:#e0563f; --gold:#c9a469; --teal:#5b7a78;
+        --mono:'Space Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+        --sans:Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Open Sans','Helvetica Neue',sans-serif;
+        --display:'Plus Jakarta Sans',Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Open Sans','Helvetica Neue',sans-serif;
+        --gutter:clamp(1.25rem, 5vw, 3rem);
+      }
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{background:var(--ink);color:var(--mist);font-family:var(--sans);line-height:1.65;min-height:100dvh}
+      a{color:inherit;text-decoration:none}
+      button{font-family:inherit;cursor:pointer}
+      .container{padding:clamp(1rem,4vw,2.5rem) var(--gutter);max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:clamp(1.25rem,3vw,2rem)}
+      header{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem;border-bottom:1px solid rgba(207,196,178,.14);padding-bottom:1.25rem}
+      h1{font-family:var(--display);color:var(--bone);text-transform:uppercase;letter-spacing:.08em;font-size:clamp(1.25rem,3vw,1.75rem)}
+      .eyebrow{font-family:var(--mono);text-transform:uppercase;letter-spacing:.34em;font-size:.68rem;color:var(--mist-dim)}
+      .grid{display:grid;gap:clamp(1rem,2vw,1.25rem)}
+      .g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+      .g3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+      .card{background:radial-gradient(ellipse at 50% 20%,rgba(20,14,10,.98),rgba(10,7,5,.98));border:1px solid rgba(207,196,178,.16);border-radius:.75rem;padding:clamp(1rem,2vw,1.25rem);display:flex;flex-direction:column;gap:1rem;box-shadow:0 60px 120px -40px rgba(0,0,0,.9)}
+      .card header{border-bottom:none;padding-bottom:0;align-items:center}
+      h2{font-family:var(--display);color:var(--bone);text-transform:uppercase;letter-spacing:.08em;font-size:clamp(1rem,2vw,1.15rem)}
+      fieldset{display:flex;flex-direction:column;gap:.75rem;border:none}
+      label{display:flex;flex-direction:column;gap:.4rem}
+      .label{font-family:var(--mono);text-transform:uppercase;letter-spacing:.26em;font-size:.66rem;color:var(--mist-dim)}
+      input,textarea,select{background:rgba(10,7,5,.6);border:1px solid rgba(207,196,178,.28);color:var(--bone);padding:.7rem .85rem;border-radius:.6rem;font-family:var(--mono);font-size:.92rem;letter-spacing:.04em}
+      textarea{min-height:140px;resize:vertical;line-height:1.7}
+      .row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:space-between}
+      .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.65rem .9rem;border-radius:.6rem;text-transform:uppercase;letter-spacing:.18em;font-size:.72rem;border:1px solid transparent;background:var(--red);color:#fff;transition:transform .15s,background .15s,border-color .15s}
+      .btn:hover{background:var(--red-bright);transform:translateY(-1px)}
+      .btn.ghost{background:transparent;border-color:rgba(207,196,178,.4);color:var(--bone)}
+      .btn.ghost:hover{border-color:var(--bone);background:rgba(207,196,178,.08)}
+      .btn.danger{background:transparent;border-color:rgba(192,57,43,.55);color:var(--red-bright)}
+      table{width:100%;border-collapse:collapse;font-size:.95rem}
+      th,td{padding:.6rem .5rem;border-bottom:1px solid rgba(207,196,178,.12);vertical-align:top;text-align:left}
+      th{font-family:var(--mono);text-transform:uppercase;letter-spacing:.22em;font-size:.64rem;color:var(--mist-dim)}
+      .small{font-size:.9rem;color:var(--mist)}
+      .mono{font-family:var(--mono)}
+      .pill{padding:.15rem .45rem;border-radius:999px;border:1px solid rgba(201,164,105,.55);color:var(--gold);font-family:var(--mono);text-transform:uppercase;letter-spacing:.2em;font-size:.6rem}
+      .muted{color:var(--mist-dim)}
+      .toggle{display:flex;align-items:center;gap:.75rem;padding:.65rem .85rem;border:1px solid rgba(207,196,178,.22);border-radius:.6rem;background:rgba(10,7,5,.4)}
+      .toggle input{accent-color:var(--red-bright);width:1.1rem;height:1.1rem}
+      footer{margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(207,196,178,.14);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.75rem}
+      .toast{position:fixed;bottom:1.25rem;right:1.25rem;padding:.65rem .85rem;border-radius:.6rem;background:rgba(10,7,5,.96);border:1px solid rgba(207,196,178,.4);box-shadow:0 20px 60px -20px rgba(0,0,0,.9);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;transform:translateY(6px)}
+      .toast.show{opacity:1;transform:translateY(0)}
+      .tag{padding:.1rem .4rem;border:1px solid rgba(207,196,178,.28);border-radius:999px}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <p class="eyebrow">SEWINX / MASTER DASHBOARD</p>
+          <h1>Cinematic Control Panel</h1>
+          <p class="small muted">Manage content, visibility, ownership &amp; contributors.</p>
+        </div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <a class="btn ghost" href="/" target="_blank" rel="noopener">View Site →</a>
+          <button class="btn ghost" id="logoutBtn">Log out</button>
+        </div>
+      </header>
+
+      <!-- OVERVIEW -->
+      <section class="card">
+        <header><h2>Overview</h2></header>
+        <div class="grid g3">
+          <div class="card" style="gap:.4rem">
+            <p class="eyebrow">Maintenance</p>
+            <p class="mono small" id="maintStatus">{settings.maintenance==='true' ? 'ENABLED' : 'DISABLED'}</p>
+            <label class="toggle">
+              <input type="checkbox" id="maintToggle" checked={settings.maintenance==='true'} />
+              <span class="small">Enable whole-site maintenance page</span>
+            </label>
+            <label>
+              <span class="label">Maintenance Message</span>
+              <input id="maintMsg" value={settings.maintenance_message ?? 'The system is under maintenance.'} />
+            </label>
+            <button class="btn" id="saveMaint">Save Maintenance</button>
+          </div>
+          <div class="card" style="gap:.4rem">
+            <p class="eyebrow">Ownership</p>
+            <label><span class="label">Owner Name</span><input id="ownName" value={settings.ownership_name ?? ''} /></label>
+            <label><span class="label">Site URL</span><input id="ownSite" value={settings.ownership_site ?? ''} /></label>
+            <button class="btn" id="saveOwn">Save Ownership</button>
+          </div>
+          <div class="card" style="gap:.4rem">
+            <p class="eyebrow">Quick Stats</p>
+            <div class="grid">
+              <p class="small"><span class="mono">{projects.length}</span> PROJECTS</p>
+              <p class="small"><span class="mono">{skills.length}</span> SKILLS</p>
+              <p class="small"><span class="mono">{experience.length}</span> EXPERIENCE</p>
+              <p class="small"><span class="mono">{contributors.length}</span> CONTRIBUTORS</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="card">
+        <header><h2>Projects</h2><button class="btn" id="addProj">+ Add Project</button></header>
+        <div class="grid">
+          <form id="projForm" class="grid g2" style="display:none">
+            <input type="hidden" name="id" />
+            <fieldset>
+              <label><span class="label">Title</span><input name="title" required /></label>
+              <label><span class="label">Slug</span><input name="slug" required placeholder="lernio" /></label>
+              <label><span class="label">Category</span><input name="category" required /></label>
+              <div class="row"><label style="flex:1"><span class="label">Year</span><input name="year" required /></label><label style="flex:1"><span class="label">Role</span><input name="role" required /></label></div>
+              <label><span class="label">Technologies (comma separated)</span><input name="technologies" placeholder="Astro, TypeScript, GSAP" /></label>
+              <div class="row"><label style="flex:1"><span class="label">Thumbnail</span><input name="thumbnail" required /></label><label style="flex:1"><span class="label">Image (optional)</span><input name="image" /></label></div>
+              <label class="toggle"><input type="checkbox" name="featured" /><span class="small">Featured</span></label>
+              <div class="row"><label style="flex:1"><span class="label">Link (optional)</span><input name="link" /></label><label style="flex:1"><span class="label">Source (optional)</span><input name="source" /></label></div>
+            </fieldset>
+            <fieldset>
+              <label><span class="label">Overview</span><textarea name="overview" required /></label>
+              <label><span class="label">Process</span><textarea name="process" required /></label>
+              <label><span class="label">Features (comma/newline → array)</span><textarea name="features" placeholder="Cinematic onboarding sequence&#10;Responsive layouts" /></label>
+              <label><span class="label">Result</span><textarea name="result" required /></label>
+              <div class="row"><button class="btn" type="submit">Save Project</button><button class="btn ghost" type="button" id="cancelProj">Cancel</button></div>
+            </fieldset>
+          </form>
+          <div style="overflow:auto">
+            <table>
+              <thead><tr><th>ID</th><th>Title</th><th>Slug</th><th>Category</th><th>Featured</th><th>Updated</th><th></th></tr></thead>
+              <tbody id="projBody">
+                {projects.map((p:any)=>(
+                  <tr data-proj={JSON.stringify({...p,technologies:JSON.parse(p.technologies||'[]'),features:JSON.parse(p.features||'[]')})}>
+                    <td class="mono">{p.id}</td><td>{p.title}</td><td class="mono">{p.slug}</td><td>{p.category}</td><td>{p.featured?1:0}</td><td class="mono muted">{new Date(p.updated_at).toLocaleString()}</td>
+                    <td style="text-align:right;display:flex;gap:.25rem;justify-content:flex-end"><button class="btn ghost small editProj">Edit</button><button class="btn danger small delProj">Delete</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- NAVIGATION -->
+      <section class="card">
+        <header><h2>Navigation</h2></header>
+        <form id="navForm" class="grid" style="gap:.5rem">
+          {navigation.map((n:any)=>(
+            <div class="row" data-nav-id={n.id}>
+              <input class="nav-ref" value={n.ref} placeholder="home" style="max-width:120px" />
+              <input class="nav-label" value={n.label} placeholder="Home" style="flex:1" />
+              <input class="nav-pos" type="number" value={n.position} style="max-width:80px" />
+              <label class="toggle"><input class="nav-vis" type="checkbox" checked={n.visible===1} /><span class="small">Visible</span></label>
+            </div>
+          ))}
+          <div><button class="btn" type="submit">Save Navigation</button></div>
+        </form>
+      </section>
+
+      <!-- SKILLS -->
+      <section class="card">
+        <header><h2>Skills</h2><button class="btn" id="addSkill">+ Add Skill</button></header>
+        <form id="skillForm" class="row" style="display:none;gap:.5rem;align-items:flex-end">
+          <label><span class="label">Group</span><input name="group_title" required /></label>
+          <label><span class="label">Name</span><input name="name" required /></label>
+          <label><span class="label">Position</span><input name="position" type="number" value="0" /></label>
+          <button class="btn" type="submit">Save</button><button class="btn ghost" type="button" id="cancelSkill">Cancel</button>
+        </form>
+        <div style="overflow:auto">
+          <table><thead><tr><th>ID</th><th>Group</th><th>Skill</th><th>Pos</th><th></th></tr></thead>
+          <tbody id="skillBody">
+            {skills.map((s:any)=>(
+              <tr data-skill={JSON.stringify(s)}><td class="mono">{s.id}</td><td>{s.group_title}</td><td>{s.name}</td><td class="mono">{s.position}</td>
+              <td style="text-align:right"><button class="btn ghost small delSkill">Delete</button></td></tr>
+            ))}
+          </tbody>
+        </table>
+        </div>
+      </section>
+
+      <!-- EXPERIENCE -->
+      <section class="card">
+        <header><h2>Experience</h2><button class="btn" id="addExp">+ Add Experience</button></header>
+        <form id="expForm" class="grid g2" style="display:none">
+          <label><span class="label">Year</span><input name="year" required /></label>
+          <label><span class="label">Role</span><input name="role" required /></label>
+          <label><span class="label">Place</span><input name="place" /></label>
+          <label><span class="label">Position</span><input name="position" type="number" value="0" /></label>
+          <label style="grid-column:1/-1"><span class="label">Description</span><textarea name="description" required /></label>
+          <div class="row" style="grid-column:1/-1"><button class="btn" type="submit">Save</button><button class="btn ghost" type="button" id="cancelExp">Cancel</button></div>
+        </form>
+        <div style="overflow:auto">
+          <table><thead><tr><th>ID</th><th>Year</th><th>Role</th><th>Place</th><th>Pos</th><th></th></tr></thead>
+          <tbody id="expBody">
+            {experience.map((e:any)=>(
+              <tr data-exp={JSON.stringify(e)}><td class="mono">{e.id}</td><td class="mono">{e.year}</td><td>{e.role}</td><td>{e.place||''}</td><td class="mono">{e.position}</td>
+              <td style="text-align:right"><button class="btn danger small delExp">Delete</button></td></tr>
+            ))}
+          </tbody>
+        </table>
+        </div>
+      </section>
+
+      <!-- HOME -->
+      <section class="card">
+        <header><h2>Home</h2></header>
+        <form id="homeForm" class="grid g2">
+          {Object.entries(home).map(([k,v])=>(
+            <label><span class="label">{k}</span><input name={k} value={v??''} /></label>
+          ))}
+          <div class="row" style="grid-column:1/-1"><button class="btn" type="submit">Save Home</button></div>
+        </form>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="card">
+        <header><h2>About</h2></header>
+        <form id="aboutForm" class="grid g2">
+          <label><span class="label">eyebrow</span><input name="eyebrow" value={about.eyebrow??''} /></label>
+          <label><span class="label">title</span><input name="title" value={about.title??''} /></label>
+          <label style="grid-column:1/-1"><span class="label">profile (JSON array of {label,value})</span><textarea name="profile">{about.profile??'[]'}</textarea></label>
+          <label style="grid-column:1/-1"><span class="label">lead</span><textarea name="lead">{about.lead??''}</textarea></label>
+          <div class="row" style="grid-column:1/-1"><button class="btn" type="submit">Save About</button></div>
+        </form>
+      </section>
+
+      <!-- CONTACT -->
+      <section class="card">
+        <header><h2>Contact</h2></header>
+        <form id="contactForm" class="grid g2">
+          <label><span class="label">eyebrow</span><input name="eyebrow" value={contact.eyebrow??''} /></label>
+          <label><span class="label">title</span><input name="title" value={contact.title??''} /></label>
+          <label><span class="label">title_sub</span><input name="title_sub" value={contact.title_sub??''} /></label>
+          <label style="grid-column:1/-1"><span class="label">links (JSON)</span><textarea name="links">{contact.links??'[]'}</textarea></label>
+          <label><span class="label">note</span><input name="note" value={contact.note??''} /></label>
+          <div class="row" style="grid-column:1/-1"><button class="btn" type="submit">Save Contact</button></div>
+        </form>
+      </section>
+
+      <!-- BRAND -->
+      <section class="card">
+        <header><h2>Brand</h2></header>
+        <form id="brandForm" class="grid g2">
+          {Object.entries(brand).map(([k,v])=>(
+            <label><span class="label">{k}</span><input name={k} value={v??''} /></label>
+          ))}
+          <div class="row" style="grid-column:1/-1"><button class="btn" type="submit">Save Brand</button></div>
+        </form>
+      </section>
+
+      <!-- SEO -->
+      <section class="card">
+        <header><h2>SEO</h2></header>
+        <form id="seoForm" class="grid g2">
+          {Object.entries(seo).map(([k,v])=>(
+            <label><span class="label">{k}</span><input name={k} value={v??''} /></label>
+          ))}
+          <div class="row" style="grid-column:1/-1"><button class="btn" type="submit">Save SEO</button></div>
+        </form>
+      </section>
+
+      <!-- CONTRIBUTORS -->
+      <section class="card">
+        <header><h2>Contributors (Ownership &amp; Credits)</h2><button class="btn" id="addContrib">+ Add Contributor</button></header>
+        <form id="contribForm" class="row" style="display:none;gap:.5rem;align-items:flex-end">
+          <label><span class="label">Name</span><input name="name" required /></label>
+          <label><span class="label">Role</span><input name="role" /></label>
+          <label style="flex:1"><span class="label">URL</span><input name="url" /></label>
+          <button class="btn" type="submit">Save</button><button class="btn ghost" type="button" id="cancelContrib">Cancel</button>
+        </form>
+        <div style="overflow:auto">
+          <table><thead><tr><th>ID</th><th>Name</th><th>Role</th><th>URL</th><th>Created</th><th></th></tr></thead>
+          <tbody id="contribBody">
+            {contributors.map((c:any)=>(
+              <tr data-contrib={JSON.stringify(c)}><td class="mono">{c.id}</td><td>{c.name}</td><td>{c.role||''}</td><td class="mono small">{c.url||''}</td><td class="mono muted">{new Date(c.created_at).toLocaleString()}</td>
+              <td style="text-align:right"><button class="btn danger small delContrib">Delete</button></td></tr>
+            ))}
+          </tbody>
+        </table>
+        </div>
+      </section>
+
+      <footer><p class="small muted">SEWINX Master Dashboard · Built with Astro + SQLite</p><p class="small muted mono">v1.0.0</p></footer>
+    </div>
+    <div id="toast" class="toast"></div>
+    <script type="module" src="/admin.js"></script>
+  </body>
+</html>

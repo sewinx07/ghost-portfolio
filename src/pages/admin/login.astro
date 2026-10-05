@@ -1,0 +1,82 @@
+---
+export const prerender = false;
+---
+<DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SEWINX / Admin — Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;700&family=Space+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style is:global>
+      :root {
+        --ink: #0b0806;
+        --bone: #e8dfd0;
+        --mist: #cfc4b2;
+        --red: #c0392b;
+        --red-bright: #e0563f;
+        --mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+        --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        --display: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { background: var(--ink); color: var(--mist); font-family: var(--sans); min-height: 100dvh; display: grid; place-items: center; padding: 2rem; }
+      .card { border: 1px solid rgba(207,196,178,0.18); background: radial-gradient(ellipse at 50% 20%, rgba(20,14,10,0.98), rgba(10,7,5,0.98)); padding: clamp(1.25rem, 4vw, 2rem); border-radius: 1rem; width: min(92vw, 28rem); box-shadow: 0 60px 120px -40px rgba(0,0,0,0.9); }
+      h1 { font-family: var(--display); color: var(--bone); letter-spacing: 0.08em; text-transform: uppercase; font-size: clamp(1.25rem, 2.5vw, 1.5rem); }
+      p { margin-top: 0.5rem; font-size: 0.98rem; color: var(--mist); }
+      form { margin-top: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem; }
+      label { display: flex; flex-direction: column; gap: 0.5rem; }
+      span { font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.26em; font-size: 0.68rem; color: var(--mist); }
+      input { background: rgba(10,7,5,0.6); border: 1px solid rgba(207,196,178,0.28); color: var(--bone); padding: 0.85rem 1rem; border-radius: 0.75rem; font-family: var(--mono); font-size: 1rem; letter-spacing: 0.08em; }
+      input::placeholder { color: rgba(207,196,178,0.45); }
+      button { background: var(--red); color: #fff; border: none; padding: 0.95rem 1rem; border-radius: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.8rem; cursor: pointer; transition: transform 0.2s, background 0.2s; }
+      button:hover { background: var(--red-bright); transform: translateY(-1px); }
+      .error { color: var(--red-bright); font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.24em; min-height: 0.9rem; }
+      .hint { margin-top: 1rem; font-size: 0.88rem; color: rgba(207,196,178,0.75); }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>SEWINX / MASTER DASHBOARD</h1>
+      <p>Single-owner access. Sign in to manage your portfolio.</p>
+      <form id="loginForm">
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" placeholder="••••••••" autocomplete="current-password" required />
+        </label>
+        <div class="error" id="error"></div>
+        <button type="submit">Sign in</button>
+      </form>
+      <p class="hint">Tip: set <code>ADMIN_PASSWORD_HASH</code> in production.</p>
+    </main>
+    <script is:inline>
+      const form = document.getElementById('loginForm');
+      const errorEl = document.getElementById('error');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorEl.textContent = '';
+        const data = new FormData(form);
+        const password = data.get('password');
+        try {
+          const res = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password }),
+          });
+          if (res.ok) {
+            window.location.href = '/admin';
+          } else {
+            errorEl.textContent = 'Invalid password';
+          }
+        } catch (err) {
+          errorEl.textContent = 'Login failed';
+        }
+      });
+    </script>
+  </body>
+</html>
